@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-ibermatica
+  namespace: cttione
+  labels:
+    app: demo-ibermatica
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: demo-ibermatica
+  template:
+    metadata:
+      labels:
+        app: demo-ibermatica
+    spec:
+      containers:
+      - name: demo-ibermatica
+        image: 10.98.141.247:8082/ibermatica-image:120
+        resources:
+          limits:
+            memory: 1024
+            cpu: 0.5
+        requests:
+          memory: 1024
+          cpu: 0.5
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ibermatica
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ibermatica
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+
+      imagePullSecrets:
+        - name: regsecret
